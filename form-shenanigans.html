@@ -1,0 +1,109 @@
+<html>
+<head>
+<title>Form Data For Email</title>
+
+</head>
+
+<body>
+<section class="contact-form">
+  <h1>Send Me a Message</h1>
+  <p>Use this handy contact form to get in touch with me.</p>
+  
+  <form enctype='multipart/form-data'>
+    
+    <div class="input-group">
+      <label for="name">Full Name</label>
+      <input id="name" name="name" type="text" value="Brad"/>
+    </div>
+    
+
+    
+    <div class="input-group">
+      <label for="subject">How can I help you?</label>
+      <select id="subject" name="subject">
+        <option>I have a problem.</option>
+        <option selected="selected">I have a general question.</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <input type="file" name="imgFile0" id="imgFile0">
+      <input type="hidden" name="imgText0" id="imgText0">
+    </div>
+    <div class="input-group">
+      <input type="file" name="imgFile1" id="imgFile1">
+      <input type="hidden" name="imgText0" id="imgText1">
+    </div>
+    <div class="input-group">
+      <input type="file" name="imgFile2" id="imgFile2">
+      <input type="hidden" name="imgText0" id="imgText2">
+    </div>
+    <div class="input-group">
+      <input type="file" name="imgFile3" id="imgFile3">
+      <input type="hidden" name="imgText0" id="imgText3">
+    </div>
+    
+    <input name="secret" type="hidden" value="1b3a9374-1a8e-434e-90ab-21aa7b9b80e7"/>
+    <button type="submit">Send It!</button>
+  </form>
+</section>
+
+<p class="results"></p>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+    function getUploadFileData(event){
+        var files = event.target.files;
+        for (var i = 0; i < files.length; i++) {
+        var file=files[i];
+        reader = new FileReader();
+        reader.onload = function(){
+            //console.log(this.result);
+            document.getElementById(event.target.hiddenInputId).value = this.result;
+        };
+        reader.readAsDataURL(file);
+        }
+    }
+    
+    function handleFormSubmit(event) {
+        event.preventDefault();
+    
+        const data = new FormData(event.target);
+    
+        const formJSON = Object.fromEntries(data.entries());
+    
+        console.log("formJSON", formJSON);
+
+        //for multi-selects, we need special handling
+        formJSON.snacks = data.getAll('snacks');
+        
+        console.log(formJSON);
+        
+        
+        const results = document.querySelector('.results');
+        results.innerHTML = JSON.stringify(formJSON, null, 2);
+    }
+
+    $( document ).ready(function() {
+
+        fileInputIdList = ['imgFile0', 'imgFile1', 'imgFile2', 'imgFile3'];
+        
+        fileInputArrayLength = fileInputIdList.length;
+        
+        let fileInputArray = [];
+
+        for (i=0; i < fileInputArrayLength; i++) {
+            fileInputArray.push(document.getElementById(fileInputIdList[i]));
+            fileInputArray[i].addEventListener('change', getUploadFileData, false);
+            fileInputArray[i].hiddenInputId = "imgText" + i;
+        }
+        
+        const form = document.querySelector('.contact-form');
+        form.addEventListener('submit', handleFormSubmit);
+    });
+
+</script>
+</body>
+</html>
